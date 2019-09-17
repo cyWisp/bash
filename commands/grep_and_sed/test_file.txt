@@ -1,5 +1,0 @@
-this is a test file for the purposes of grepping text from. run commands,
-and see if you can find all the words in this paragraph and find out how many times
-each of them occur. there is a lot more to it than just running the command itself.
-look up and research any switches and syntax nuances that may apply to the
-command you are trying to use.
