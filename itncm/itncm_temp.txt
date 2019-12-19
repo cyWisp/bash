@@ -1,0 +1,294 @@
+#!/usr/bin/ksh
+
+################################################################################
+##set -vx                                 ## Used to enable debugging
+##exec 1> /tmp/scriptName.trace   ## Writes "Standard out" to file.
+##exec 2>&1                               ## Writes "Standard error" to a file.
+################################################################################
+
+echo ''
+echo ''
+echo '### HOST_ADDRESS_INFO_START ###' > /tmp/h.txt
+lsdev -Cc if | grep Standard | awk -F " " '{print $1}' | while read ID
+do
+A=$(hostname)
+B=$(ifconfig $ID | awk '/inet / {print $2}')
+C=$(entstat $ID | awk '/Hardware / {print $3}')
+
+printf "%-30.30s, %-20.20s, %-20.20s\n" "Hostname" "IpAddress" "MacAddress" >> /tmp/h.txt
+printf "%-30.30s, %-20.20s, %-20.20s\n" "$A" "$B" "$C" >> /tmp/h.txt
+done
+echo '' >> /tmp/h.txt
+echo '### HOST_ADDRESS_INFO_END ###' >> /tmp/h.txt
+cat /tmp/h.txt
+echo ''
+echo ''
+################################################################################
+
+################################################################################
+echo ' START_OF_SCRIPT '
+echo ''
+echo ''
+################################################################################
+
+
+# CIP 07__1
+################################################################################
+echo '### CIP:007_6_R1:1__START ###'
+echo '### CIP:010_2_R1:1:4__START ###'
+echo '###__Ports and Services that are enabled or listening on the system ###'
+DATE=`(date +"%m%d%y.%H%M")`
+SUMMARY="/tmp/NstatSummary.txt"
+STAGE="/tmp/NstatSumSTAGE_$DATE.txt"
+> $SUMMARY
+> $STAGE
+LINE="================================================================================================================="
+#================================================================================================================="
+##----- 1         3         4       5       7       8       9
+printf "%-20.20s, %-10.10s, %-5.5s, %-5.5s, %-9.9s, %-4.4s, %-30.30s\n" COMMAND         USER   FD   TYPE   SIZE_OFF NODE NAME >> $SUMMARY
+lsof -nPi |egrep -i "LISTEN|UDP|NAME" |sort -k8,8 -k9rn,9 |egrep -v "NAME|127.0.0.1|::1" |sed s/\*/\\*/g > $STAGE
+for INST in `cat $STAGE |grep -n "" |cut -d":" -f1`
+do
+v1=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $1}'`
+v3=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $3}'`
+v4=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $4}'`
+v5=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $5}'`
+v7=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $7}'`
+v8=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $8}'`
+v9=`grep -n "" $STAGE |grep "^$INST": |cut -d":" -f2- |awk '{print $9,$10}'`
+#================================================================================================================="
+##----  1         3         4       5       7       8       9
+printf "%-20.20s, %-10.10s, %-5.5s, %-5.5s, %-9.9s, %-4.4s, %-30.30s\n" "$v1" "$v3" "$v4" "$v5" "$v7" "$v8" "$v9" >> $SUMMARY
+done
+cat $SUMMARY
+echo '### CIP:010_2_R1:1:4__END ###'
+echo '### CIP:007_6_R1:1__END ###'
+echo ''
+echo ''
+
+
+# CIP 07__2
+# CIP 10__5 pointed here
+################################################################################
+echo '### CIP:007_6_R2:3__START ###'
+echo '### CIP:010_2_R1:1:5__START ###'
+echo '###__Any Security Patches applied ###'
+echo '###___System___###'
+instfix -i
+# APP SPECIFIC
+########################################
+echo ''
+echo '###___APP VERSION___###'
+#cd /homea/fcscada
+#cksum Application_Baseline_FCS.ksh
+#./Application_Baseline_FCS.ksh
+#cat Application_Baseline_FCS*.log
+file=/homea/fcscada/Application_Baseline_FCS.ksh
+
+if [[ -e $file ]]; then
+        cksum $file
+        $file
+        cat /homea/fcscada/Application_Baseline_FCS*.log
+else
+        echo "###___File does not Exist on this Server___###"
+fi
+#rpm -qa | tr [a-z] [A-Z]
+echo '### CIP:010_5_R1:1:5__END ###'
+echo '### CIP:007_6_R2:3__END ###'
+echo ''
+echo ''
+
+
+# CIP 07__3
+# not applicable
+################################################################################
+echo '### CIP:007_6_R3:1__START ###'
+echo '###__Check if device has AV installed ###'
+echo '###__________Not Capable__________###'
+echo '### CIP:007_6_R3:1__END ###'
+echo ''
+echo ''
+
+
+# CIP 07__4
+# how is access authenticated, how to enforce authentication, show authentication methods
+# CIP 7__9 pointed here
+# CIP 7__5 pointed here
+# 8/27/18 | added syslog
+################################################################################
+echo '### CIP:007_6_R5:1__START ###'
+echo '### CIP:007_6_R5:5:1__START ###'
+echo '### CIP:007_6_R5:5:2__START ###'
+echo '### CIP:007_6_R5:7__START ###'
+echo '###__Check to ensure that authentication methods are enabled pointing to appropriate server ###'
+sed 's/\*//g' /etc/security/user | grep -p default:
+echo ''
+cat /etc/syslog.conf|grep -v "^#"|sed '/^\s*$/d'|sort
+echo '### CIP:007_6_R5:7__END ###'
+echo '### CIP:007_6_R5:5:2__END ###'
+echo '### CIP:007_6_R5:5:1__END ###'
+echo '### CIP:007_6_R5:1__END ###'
+echo ''
+echo ''
+
+
+# CIP-07__7
+################################################################################
+echo '### CIP:007_6_R5:2__START ###'
+echo '###__Detect any default or generic account and report it ###'
+egrep -v "/home|Admin|root" /etc/passwd
+echo '### CIP:007_6_R5:2__END ###'
+echo ''
+echo ''
+
+
+# CIP-07__8
+# change known default passwords, procedure that password is changed when new devices are added
+#command added
+################################################################################
+echo '### CIP:007_6_R5:4__START ###'
+echo '###__Check for any default passwords ###'
+egrep -v "/home|Admin|root" /etc/passwd | awk -F : '{print $1}' | while read ID
+do
+lsuser -a account_locked $ID
+done
+echo '### CIP:007_6_R5:4__END ###'
+echo ''
+echo ''
+
+
+# CIP-07__9
+# 2 Part
+# pointed to 7__4
+################################################################################
+#lssec -f /etc/security/user -a minlen -a minupperalpha -a minloweralpha -a mindigit -a minalpha -s default;lsuser -a minlen minupperalpha minloweralpha mindigit minalpha ALL
+echo '### CIP:007_6_R5:5:1__START ###'
+echo '###__Check Password complexity to meet 8 characters in length ###'
+echo '###__________SEE CIP:007_6_R5:1__________###'
+echo '### CIP:007_6_R5:5:2__START ###'
+echo '###__Check password that upper case lowercase numeric and non numeric characters are enforced ###'
+echo '###__________SEE CIP:007_6_R5:1__________###'
+echo '### CIP:007_6_R5:5:2__END ###'
+echo '### CIP:007_6_R5:5:1__END ###'
+echo ''
+echo ''
+
+
+# CIP-07__10
+# 8/22/18 | added command
+################################################################################
+echo '### CIP:007_6_R5:6__START ###'
+echo '###__Check for user account password not changed within 15 calendar months ###'
+intuserpass(){
+egrep "/home|root|Admin" /etc/passwd | awk -F : '{print $1}' | while read ID
+do
+printf "${ID}:";lsuser -a lastupdate $ID | awk -F = '{print $2}'
+done
+}
+intuserpass > /tmp/userpass
+for userpass in $(cat /tmp/userpass)
+do
+A=$(echo $userpass | cut -d : -f 2)
+B=$(date +%s)
+C=`echo "$B - $A" | bc -l`
+D=34214390
+if [ $C -gt $D ]
+then
+echo $(echo $userpass | cut -d : -f 1)
+#else
+#echo '###__________No Users Found__________###'
+fi
+done
+echo '### CIP:007_6_R5:6__END ###'
+echo ''
+echo ''
+
+
+# CIP 07__5
+# limit number of unsuccessfull attempts + generate alerts after threshold, account lockout parameters
+# pointed to 7__4
+################################################################################
+#echo '###__Check to ensure that logging is enabled and sending data to the correct collectors ###'
+echo '### CIP:007_6_R5:7__START ###'
+echo '###__Check for Account lockout enabled for a specified threshold ###'
+echo '###__________SEE CIP:007_6_R5:1__________###'
+echo '### CIP:007_6_R5:7__END ###'
+echo ''
+echo ''
+
+
+# CIP 10__1
+# 12/12/18 | added fw
+# 12/12/18 | refined format
+################################################################################
+echo '### CIP:010_2_R1:1:1__START ###'
+echo '###__Operating system or firmware including version ###'
+echo '###__System OS__START ###'
+oslevel -s
+echo '###__System OS__END ###'
+echo '###__Firmware or BIOS__START ###'
+lsmcode -c | grep perm
+echo '###__Firmware or BIOS__END ###'
+echo '###__GPU__START ###'
+echo '###__________Not Identifiable__________ ###'
+echo '###__GPU__END ###'
+echo '### CIP:010_2_R1:1:1__END ###'
+echo ''
+echo ''
+
+
+# CIP 10__2
+# CIP 10__3 pointed here
+# 01/02/19 | removed brackets around tr
+################################################################################
+echo '### CIP:010_2_R1:1:2__START ###'
+echo '### CIP:010_2_R1:1:3__START ###'
+echo '###__Any commercially available or open_source application software installed including version ###'
+lslpp -i | tr a-z A-Z
+echo ''
+echo ''
+rpm -qa | tr a-z A-Z
+echo '### CIP:010_2_R1:1:3__END ###'
+echo '### CIP:010_2_R1:1:2__END ###'
+echo ''
+echo ''
+
+
+# CIP 10__3
+# pointed to 10__2
+################################################################################
+echo '### CIP:010_2_R1:1:3__START ###'
+echo '###__Any custom software installed ###'
+echo '###__________SEE CIP:010_2_R1:1:2__________###'
+echo '### CIP:010_2_R1:1:3__END ###'
+echo ''
+echo ''
+
+
+# CIP 10__4
+# pointed to 7__1
+################################################################################
+echo '### CIP:010_2_R1:1:4__START ###'
+echo '###__Any logical network accessible ports ###'
+echo '###__________SEE CIP:007_6_R1:1__________###'
+echo '### CIP:010_2_R1:1:4__END ###'
+echo ''
+echo ''
+
+
+# CIP 10__5
+# pointed to 7__2
+################################################################################
+echo '### CIP:010_2_R1:1:5__START ###'
+echo '###__Any security patches installed ###'
+echo '###__________SEE CIP:007_6_R2:3__________###'
+echo '### CIP:010_5_R1:1:5__END ###'
+echo ''
+echo ''
+
+
+################################################################################
+echo ' END_OF_SCRIPT '
+################################################################################
+echo '::'
+return
