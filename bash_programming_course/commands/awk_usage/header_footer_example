@@ -1,0 +1,11 @@
+BEGIN {
+	print "NAME HEADER"
+}
+
+{
+	print $0
+}
+
+END {
+	print "NAME FOOTER"
+}

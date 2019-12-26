@@ -1,0 +1,14 @@
+BEGIN {
+	print "Users and their corresponding home directories"
+	print "USER NAME \t HOME DIRECTORY"
+	print "--------- \t --------------"
+	FS = ":"
+}
+
+{
+	print $1 " \t " $6
+}
+
+END {
+	print "|===== FOOTER =====|"
+}
