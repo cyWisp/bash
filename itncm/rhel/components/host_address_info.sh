@@ -1,19 +1,10 @@
-echo ''
-echo ''
-echo '### HOST_ADDRESS_INFO_START ###' > /tmp/h.txt
-ip route | grep default | awk -F " " '{print $5}' | while read ID
-do
-A=$(hostname)
-B=$(ip addr show $ID | awk '/inet / {print $2}')
-C=$(ip addr show $ID | awk ' /ether/ {print $2}')
-#echo Hostname "          " IP Address/Mask "  "  MAC Address
-#echo $A "  " $B "  " $C "  "
-echo '' >> /tmp/h.txt
-printf "%-30.30s, %-20.20s, %-20.20s\n" "Hostname" "IpAddress" "MacAddress" >> /tmp/h.txt
-printf "%-30.30s, %-20.20s, %-20.20s\n" "$A" "$B" "$C" >> /tmp/h.txt
-done
-echo '' >> /tmp/h.txt
-echo '### HOST_ADDRESS_INFO_END ###' >> /tmp/h.txt
-cat /tmp/h.txt
-echo ''
-echo ''
+#!/bin/bash
+function get_network_info(){
+        get_ip=$(ifconfig | grep wlp2s0 -A1 | grep inet | awk '{print $2}')
+        host_name=$(hostname)
+        get_mac=$(ifconfig | grep wlp2s0 -A3 | grep ether | awk '{print $2}')
+
+        printf "hostname,ip_address,mac_address\n"
+        printf "HOST:IP:MAC,%s,%s,%s\n" $host_name $get_ip $get_mac
+}
+get_network_info
