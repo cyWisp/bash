@@ -8,18 +8,17 @@
 # ===============================================================================
 
 function get_network_info(){
-        adapters=$(nmcli device status | sed -n '1!p' | awk '{print $1}')
         printf "hostname,ip_address,mac_address\n"
-
+        adapters=$(nmcli device status | sed -n '1!p' | awk '{print $1}')
+        
         for a in $adapters; do
             if [ "$a" = "lo" ] || [ "$a" = "p2p-dev-wlp2s0" ]; then
                     continue
             else
                 hostname=$(hostname)
-                ip_address=$(ifconfig | grep ${a} -A1 | grep inet | awk '{print $2}')
-                mac_address=$(ifconfig | grep ${a} -A3 | grep ether | awk '{print $2}')
+                ip_address=$(ip addr | grep ${a} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
+                mac_address=$(ip addr | grep ${a} -A1 | grep ether | awk '{print $2}')
 
-                printf "hostname,ip_address,mac_address\n"
                 printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
             fi
         done
@@ -29,6 +28,7 @@ function ports_and_services(){
     host_name=$(hostname)
     netstat_output=$(sudo netstat -antp)
 
+    printf "C010_2_R1:1:4, hostname,protocol,local_port,process_name\n"
     echo "${netstat_output}" | while read line; do
         protocol_type=$(echo $line | awk '{print $1}')
         port_status=$(echo $line | awk '{print $6}')
@@ -41,7 +41,6 @@ function ports_and_services(){
                 port=$(echo $line | awk '{print $4}' | cut -d ":" -f 2)
                 ip_type="IPv4"
             fi
-            printf "C010_2_R1:1:4, hostname,protocol,local_port,process_name\n"
             printf "%s,%s,%s,%s,%s\n" $host_name $protocol_type $port $ip_type $process_name
         fi
     done
