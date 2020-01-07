@@ -14,7 +14,7 @@ function verify(){
         cat $userinfo | column -t
         rm $userinfo
     else
-        echo "###___No Users Found___###"
+        echo "###___No Users Found___###\n\n"
         rm $userinfo
     fi
 }

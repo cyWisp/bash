@@ -63,6 +63,91 @@ function verify(){
     fi
 }
 
+function generic_accounts(){
+    egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}'
+    printf "\n"
+
+    itncm_users="/home/icosuser/ItncmUsers.sh"
+    if [ -e "$itncm_users" ]; then
+        printf '###___ITNCM USERS ACCESS___###\n\n'
+        /home/icosuser/ItncmUsers.sh
+        printf "\n"
+    else
+        :
+    fi
+}
+
+function auth_methods(){
+    cat /etc/pam.d/system-auth | grep -i 'auth ' | grep -v '#'
+
+    sys_log="/etc/syslog.conf"
+
+    if [ -e "$sys_log" ]; then
+        printf "\n###__Check to ensure that logging is enabled and sending data to the correct collectors ###\n\n"
+        cat $sys_log | grep -v "^#" | sed '/^\s*$/d' | sort
+    else
+        :
+    fi
+}
+
+function check_itncm_version(){
+    version="/opt/IBM/tivoli/netcool/ncm/config/rseries_version.txt"
+
+    if [ -e "$version" ]; then
+        printf "###___ITNCM Version___###\n\n"
+        cat $version
+    else
+        :
+    fi
+}
+
+function password_complexity(){
+    system_auth_file="/etc/pam.d/system-auth"
+    if [ -e "$system_auth_file" ]; then
+        cat $system_auth_file | grep -i 'password' | grep -v '#'
+    else
+        :
+    fi
+}
+
+function calc_user_age(){
+    egrep "ksh|bash" /etc/passwd | egrep ":/home" | awk -F : '{print $1}' | while read user_account; do
+        date_set=$(passwd -S ${user_account} | cut -d " " -f 3)
+        printf "%s:%s\n" $user_account $date_set; 
+    done
+}
+
+function read_age_results(){
+    cat $user_age_temp | while read user_entry; do
+
+        printf "%s\n" $user_entry
+        creation_date=$(echo ${user_entry} | cut -d ":" -f 2)
+        current_date=$(date +%Y-%m-%d)
+        pw_age=$(echo $(( (`date -d $current_date +%s` - `date -d $creation_date +%s`) / 86400 )))
+        pw_age_months=$(expr ${pw_age} / 30)
+
+        printf "Password last set: %s days\n" $pw_age
+        printf "Password age: %s months\n\n" $pw_age_months
+    
+        rm $user_age_temp
+    done
+}
+
+function account_lockout(){
+    system_auth_file_path="/etc/pam.d/system-auth"
+    cat $system_auth_file_path | grep -i 'password' | grep -v '#'
+}
+
+function os_info(){
+    redhat_info=$(cat"/etc/redhat-release")
+    bios_info=$(dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g')
+    gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
+
+    printf "###__System OS__START ###\n\n %s\n\n ###__System OS__END ###\n\n" $redhat_info
+    printf "###__Firmware or BIOS__START ###\n\n %s\n\n ###__Firmware or BIOS__END ###\n\n" $bios_info
+    printf "###__GPU__START ###\n\n %s\n\n ###__GPU__END ###\n\n" $gpu_info
+}
+
 #===========================| Host Address Information |=========================
 #================================================================================
 
@@ -75,7 +160,7 @@ printf "\n### HOST_ADDRESS_INFO_END ###\n\n"
 
 printf "### C007_6_R1:1__START ###\n"
 printf "### C010_2_R1:1:4__START ###\n"
-printf "###__Ports and Services that are listening on the system ###\n\n"
+printf "###__Ports and Services that are listening on the system__###\n\n"
 ports_and_services
 printf "\n### C010_2_R1:1:4__END ###\n"
 printf "### C007_6_R1:1__END ###\n\n"
@@ -85,12 +170,10 @@ printf "### C007_6_R1:1__END ###\n\n"
 
 printf "### C007_6_R2:3__START ###\n"
 printf "### C010_2_R1:1:5__START ###\n"
-printf "###__Any Security Patches applied ###\n\n"
+printf "###__Any Security Patches applied__###\n\n"
 
 uname -a
-
-#printf "###___ITNCM Version___###\n\n"
-#cat /opt/IBM/tivoli/netcool/ncm/config/rseries_version.txt
+check_itncm_version
 
 printf "\n### C010_2_R1:1:5__END ###"
 printf "### C010_2_R1:1:5__END ###\n\n"
@@ -100,7 +183,7 @@ printf "### C010_2_R1:1:5__END ###\n\n"
 #================================================================================
 
 printf "### CIP:007_6_R3:1__START ###\n"
-printf "###__Check if device has AV installed ###\n"
+printf "###__Check if device has AV installed__###\n"
 printf "###__________Not Capable__________###\n"
 printf "### CIP:007_6_R3:1__END ###\n\n"
 
@@ -108,15 +191,11 @@ printf "### CIP:007_6_R3:1__END ###\n\n"
 #================================================================================
 
 printf "### CIP:007_6_R5:1__START ###\n"
-printf "###__Check to ensure that authentication methods are enabled and pointing to appropriate server ###\n\n"
-cat /etc/pam.d/system-auth | grep -i 'auth ' | grep -v '#'
+printf "###__Check to ensure that authentication methods are enabled and pointing to appropriate server__###\n\n"
 
-printf "\n"
-printf "###__Check to ensure that logging is enabled and sending data to the correct collectors ###\n\n"
-cat /etc/syslog.conf|grep -v "^#"|sed '/^\s*$/d'|sort
-printf "\n"
+auth_methods
 
-printf "### CIP:007_6_R5:1__END ###\n\n"
+printf "\n### CIP:007_6_R5:1__END ###\n\n"
 
 #==================================| CIP 07__5 |=================================
 #================================================================================
@@ -125,27 +204,54 @@ printf "### CIP:007_6_R5:1__END ###\n\n"
 #================================================================================
 
 printf "### CIP:007_6_R5:2__START ###\n"
-printf "###__Detect any default or generic account and report it ###\n\n"
+printf "###__Detect any default or generic account and report it__###\n\n"
 
-egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}'
-printf "\n"
-
-printf '###___ITNCM USERS ACCESS___###\n\n'
-/home/icosuser/ItncmUsers.sh
-printf "\n"
+generic_accounts
 
 printf "### CIP:007_6_R5:2__END ###\n\n"
 
 #================================================================================
 
 printf "### CIP:007_6_R5:4__START ###\n"
-printf "###__Check for any default passwords ###\n\n"
+printf "###__Check for any default passwords__###\n\n"
 
 userinfo="/tmp/userinfo"
 get_info > $userinfo
 verify
 
 printf "\n### CIP:007_6_R5:4__END ###\n\n"
+
+#================================================================================
+
+printf "### CIP:007_6_R5:5:1__START ###\n"
+printf "###__Check Password complexity (8 characters or more)__###\n"
+printf "### CIP:007_6_R5:5:2__START ###\n"
+printf "###__Check for password policy enforcement__###\n\n"
+
+password_complexity
+
+printf "\n### CIP:007_6_R5:5:2__END ###\n"
+printf "### CIP:007_6_R5:5:1__END ###\n\n"
+
+#================================================================================
+
+printf "### CIP:007_6_R5:6__START ###\n"
+printf "###__Check for user account password not changed within 15 calendar months ###\n\n"
+
+user_age_temp="/tmp/userage"
+calc_user_age > $user_age_temp
+read_age_results
+
+printf '### CIP:007_6_R5:6__END ###\n\n'
+
+#================================================================================
+
+printf "### CIP:007_6_R5:7__START ###\n"
+printf "###__Check for Account lockout enabled for a specified threshold ###\n\n"
+
+account_lockout
+
+printf "\n### CIP:007_6_R5:7__END ###\n\n"
 
 #==================================| CIP 07__7 |=================================
 #================================================================================
@@ -164,6 +270,13 @@ printf "\n### CIP:007_6_R5:4__END ###\n\n"
 
 #==================================| CIP 010__2 |================================
 #================================================================================
+
+printf "### CIP:010_2_R1:1:1__START ###\n"
+printf "###__Operating system or firmware including version ###\n\n"
+
+os_info
+
+printf "\n### CIP:010_2_R1:1:1__END ###\n\n"
 
 #==================================| CIP 010__3 |================================
 #================================================================================
