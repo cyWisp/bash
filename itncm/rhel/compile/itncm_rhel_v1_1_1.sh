@@ -19,7 +19,7 @@ function get_network_info(){
                 ip_address=$(ifconfig | grep ${a} -A1 | grep inet | awk '{print $2}')
                 mac_address=$(ifconfig | grep ${a} -A3 | grep ether | awk '{print $2}')
 
-                printf "hostname,ip_address,mac_address"
+                printf "hostname,ip_address,mac_address\n"
                 printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
             fi
         done
