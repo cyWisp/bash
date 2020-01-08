@@ -141,11 +141,12 @@ function account_lockout(){
 function os_info(){
 
     redhat_info="/etc/redhat-release"
-    bios_info=$(dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g')
+    bios_info=$(sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g')
     gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
 
     if [ -e $redhat_info ]; then
-        printf "###__System OS__START ###\n\n %s\n\n ###__System OS__END ###\n\n" $redhat_info    
+        redhat_info_content=$(cat /etc/redhat-release)
+        printf "###__System OS__START ###\n\n %s\n\n ###__System OS__END ###\n\n" $redhat_info_content    
     else
         :
     fi
