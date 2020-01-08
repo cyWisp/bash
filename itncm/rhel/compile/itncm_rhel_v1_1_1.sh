@@ -142,10 +142,8 @@ function os_info(){
     redhat_info="/etc/redhat-release"
     
     if [ -e $redhat_info ]; then
-        redhat_info_content=$(cat /etc/redhat-release)
-
         printf "###__System OS__START ###\n\n"
-        $redhat_info_content | while read line; do
+        cat $redhat_info | while read line; do
             printf "%s\n" $line
         done
         printf "###__System OS__END ###\n\n"     
@@ -158,7 +156,7 @@ function os_info(){
     printf "###__Firmware or BIOS__END ###\n\n" 
     
     printf "###__GPU__START ###\n\n"
-    gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
+    lspci | grep -i vga | cut -d " " -f 5-10
     printf "###__GPU__END ###\n\n"
 }
 
