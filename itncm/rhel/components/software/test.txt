@@ -1,0 +1,14 @@
+RH-PYTHON36-PYTHON-3.6.9-2.EL7.X86_64                                          
+RH-PYTHON36-PYTHON-DEVEL-3.6.9-2.EL7.X86_64                                    
+RH-PYTHON36-PYTHON-LIBS-3.6.9-2.EL7.X86_64                                     
+RH-PYTHON36-PYTHON-PIP-9.0.1-2.EL7.NOARCH                                      
+RH-PYTHON36-PYTHON-SETUPTOOLS-36.5.0-1.EL7.NOARCH                              
+RH-PYTHON36-PYTHON-VIRTUALENV-15.1.0-2.EL7.NOARCH                              
+RH-PYTHON36-RUNTIME-2.0-1.EL7.X86_64
+RPM-BUILD-LIBS-4.11.3-40.EL7.X86_64
+SAMBA-CLIENT-LIBS-4.9.1-10.EL7_7.X86_64
+tools
+johnny says this thing
+there's nothing here 
+1223435454knldkngklbndglkngd
+more to come
