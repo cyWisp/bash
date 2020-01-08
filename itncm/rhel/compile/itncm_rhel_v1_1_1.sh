@@ -143,25 +143,25 @@ function os_info(){
     
     if [ -e $redhat_info ]; then
         printf "###__System OS__START ###\n\n"
-        cat $redhat_info | while read line; do
-            printf "%s\n" $line
-        done
-        printf "###__System OS__END ###\n\n"     
+        cat $redhat_info 
+        printf "\n###__System OS__END ###\n\n"     
     else
         :
     fi
     
     printf "###__Firmware or BIOS__START ###\n\n"
+    printf "BIOS Version: "
     sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g'
-    printf "###__Firmware or BIOS__END ###\n\n" 
+    printf "\n###__Firmware or BIOS__END ###\n\n" 
     
     printf "###__GPU__START ###\n\n"
     lspci | grep -i vga | cut -d " " -f 5-10
-    printf "###__GPU__END ###\n\n"
+    printf "\n###__GPU__END ###\n\n"
 }
 
 function installed_software(){
-    rpm -qa | sort |tr [a-z] [A-Z]
+    rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
+        printf "C010_2_R1:1:2,%s\n" $app
 }
 
 function db2_application(){
