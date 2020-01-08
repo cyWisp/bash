@@ -112,7 +112,7 @@ function password_complexity(){
 
 function calc_user_age(){
     egrep "ksh|bash" /etc/passwd | egrep ":/home" | awk -F : '{print $1}' | while read user_account; do
-        date_set=$(passwd -S ${user_account} | cut -d " " -f 3)
+        date_set=$(sudo passwd -S ${user_account} | cut -d " " -f 3)
         printf "%s:%s\n" $user_account $date_set; 
     done
 }
