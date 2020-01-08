@@ -139,20 +139,27 @@ function account_lockout(){
 }
 
 function os_info(){
-
     redhat_info="/etc/redhat-release"
-    bios_info=$(sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g')
-    gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
-
+    
     if [ -e $redhat_info ]; then
         redhat_info_content=$(cat /etc/redhat-release)
-        printf "###__System OS__START ###\n\n %s\n\n ###__System OS__END ###\n\n" $redhat_info_content    
+
+        printf "###__System OS__START ###\n\n"
+        $redhat_info_content | while read line; do
+            printf "%s\n" $line
+        done
+        printf "###__System OS__END ###\n\n"     
     else
         :
     fi
     
-    printf "###__Firmware or BIOS__START ###\n\n %s\n\n ###__Firmware or BIOS__END ###\n\n" $bios_info
-    printf "###__GPU__START ###\n\n %s\n\n ###__GPU__END ###\n\n" $gpu_info
+    printf "###__Firmware or BIOS__START ###\n\n"
+    sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g'
+    printf "###__Firmware or BIOS__END ###\n\n" 
+    
+    printf "###__GPU__START ###\n\n"
+    gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
+    printf "###__GPU__END ###\n\n"
 }
 
 function installed_software(){
