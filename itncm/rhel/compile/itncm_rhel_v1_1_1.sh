@@ -148,6 +148,24 @@ function os_info(){
     printf "###__GPU__START ###\n\n %s\n\n ###__GPU__END ###\n\n" $gpu_info
 }
 
+function installed_software(){
+    rpm -qa | sort |tr [a-z] [A-Z]
+}
+
+function db2_application(){
+
+    db2_app="/opt/IBM/db2instance/db2inst1/Db2Level.sh"
+
+    if [ -e "$db2_app" ]; then
+        printf "###___DB2_Application__START ###\n\n"
+        $db2_app
+        printf "\n###___DB2_Application__END ###\n"
+    else
+        :
+    fi
+
+}
+
 #===========================| Host Address Information |=========================
 #================================================================================
 
@@ -278,12 +296,41 @@ os_info
 
 printf "\n### CIP:010_2_R1:1:1__END ###\n\n"
 
+#================================================================================
+
+printf "### CIP:010_2_R1:1:2__START ###\n"
+printf "###__Any commercially available or open_source application software installed including version ###\n\n"
+
+installed_software
+db2_application
+
+printf "### CIP:010_2_R1:1:2__END ###\n\n"
+
+
 #==================================| CIP 010__3 |================================
 #================================================================================
+
+printf "### CIP:010_2_R1:1:3__START ###\n"
+printf "###__Any custom software installed ###\n"
+printf "###__________Not Capable__________###\n"
+printf "### CIP:010_2_R1:1:3__END ###\n\n"
 
 #==================================| CIP 010__4 |================================
 #================================================================================
 
+printf "### CIP:010_2_R1:1:4__START ###\n"
+printf "###__Any logical network accessible ports ###\n"
+printf "###__________SEE CIP:007_6_R1:1__________###\n"
+printf "### CIP:010_2_R1:1:4__END ###\n\n"
+
 #==================================| CIP 010__5 |================================
 #================================================================================
 
+printf "### CIP:010_2_R1:1:5__START ###\n"
+printf "###__Any security patches installed ###\n"
+printf "###__________SEE CIP:007_6_R2:3__________###\n"
+printf "### CIP:010_5_R1:1:5__END ###\n\n"
+
+#================================================================================
+
+printf "*** END_OF_SCRIPT ***\n"
