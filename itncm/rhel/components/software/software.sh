@@ -2,10 +2,12 @@
 
 function installed_software(){
     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
-        #first_field=$(echo ${app} | awk -F "." '{print $1}')
+        first_field=$(echo ${app} | awk -F "." '{print $1}')
         #display_name=${first_field::-2}
-        
-        printf "C010_2_R1:1:2,%s\n" $app
+        architecture=$(echo ${app} | awk -F "." '{print $NF}')
+
+
+        printf "C010_2_R1:1:2,%s,%s\n" $first_field $architecture
     done
 }
 
