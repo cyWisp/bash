@@ -1,5 +1,4 @@
 #!/bin/bash
-
 function installed_software(){
     host_name=$(hostname)
 
