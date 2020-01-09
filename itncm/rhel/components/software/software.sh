@@ -10,7 +10,7 @@ function installed_software(){
         architecture=$(echo ${app} | awk -F "." '{print $NF}')
         display_version=$(echo ${app} | awk -F "." '{print $NF=""; print $0}')
 
-        printf "C010_2_R1:1:2,%s\n" %display_version
+        printf "C010_2_R1:1:2,%s\n" $display_version
         #printf "C010_2_R1:1:2,%s,%s\n" $display_name $architecture
     done
 }
