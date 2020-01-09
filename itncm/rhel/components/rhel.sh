@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 ################################################################################
 ##set -vx                                 ## Used to enable debugging
 ##exec 1> /tmp/rhel5ITNCMscript.trace   ## Writes "Standard out" to file.
