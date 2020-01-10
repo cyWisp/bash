@@ -64,7 +64,12 @@ function verify(){
 }
 
 function generic_accounts(){
-    egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}'
+    printf "C007_6_R5:7,account\n"
+    system_accounts=$(egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}')
+    
+    echo "${system_accounts}" | while read account; do
+        printf "C007_6_R5:7,%s\n" $account 
+    done
     printf "\n"
 
     itncm_users="/home/icosuser/ItncmUsers.sh"
@@ -250,7 +255,7 @@ printf "###__Detect any default or generic account and report it__###\n\n"
 
 generic_accounts
 
-printf "### CIP:007_6_R5:2__END ###\n\n"
+printf "\n### CIP:007_6_R5:2__END ###\n\n"
 
 #================================================================================
 
