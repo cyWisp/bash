@@ -159,12 +159,6 @@ function os_info(){
     printf "\n###__GPU__END ###\n\n"
 }
 
-# function installed_software(){
-#     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
-#         printf "C010_2_R1:1:2,%s\n" $app
-#     done
-# }
-
 function installed_software(){
     host_name=$(hostname)
 
