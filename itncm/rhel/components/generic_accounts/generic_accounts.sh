@@ -1,14 +1,12 @@
 #!/bin/bash
 function generic_accounts(){
-    # egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}'
-    # printf "\n"
-
+    
     printf "C007_6_R5:7,account\n"
+    egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}' | while read account;do
+    printf "C007_6_R5:7,%s\n" $account 
+    printf "\n"
 
-    service_accounts=$(egrep -v "ksh|bash" /etc/passwd | egrep -v ":/home" | awk -F : '{print $1}')
-    echo "${service_accounts}" | while read account; do
-        printf "C007_6_R5:7,%s\n"
-    done
+    
 
 
 
