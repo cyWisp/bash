@@ -131,8 +131,8 @@ function read_age_results(){
         printf "Password last set: %s days\n" $pw_age
         printf "Password age: %s months\n\n" $pw_age_months
     
-        rm $user_age_temp
     done
+    rm $user_age_temp
 }
 
 function account_lockout(){
