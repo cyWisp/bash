@@ -1,31 +1,30 @@
 #!/bin/bash
 
 # ===============================================================================
-# ===========================| ITNCM Script Ver. 1.1 |===========================
+# ===========================| ITNCM Script Ver. 1.2 |===========================
 #
 #                   Target Platform: Red Hat Enterprise Linux 7
 #
 # ===============================================================================
 
 function get_network_info(){
-        printf "hostname,ip_address,mac_address\n"
-        adapters=$(nmcli device status | sed -n '1!p' | awk '{print $1}')
-        
-        for a in $adapters; do
-            if [ "$a" = "lo" ] || [ "$a" = "p2p-dev-wlp2s0" ]; then
-                    continue
-            else
-                hostname=$(hostname)
-                ip_address=$(ip addr | grep ${a} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
-                mac_address=$(ip addr | grep ${a} -A1 | grep ether | awk '{print $2}')
+    printf "hostname,ip_address,mac_address\n"
+    ns_enum=$(netstat -i | column -t)
+    
+    echo "${ns_enum}" | while read output_line; do
+        interface=$(echo "${output_line}" | awk '{print $1}')
+        if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ] || [ "$interface" = "lo" ]; then
+            continue
+        else
+            ip_address=$(ip addr | grep ${interface} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
+            mac_address=$(ip addr | grep ${interface} -A1 | grep ether | awk '{print $2}')
 
-                printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
-            fi
-        done
+            printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
+        fi
+    done 
 }
 
 function ports_and_services(){
-    host_name=$(hostname)
     netstat_output=$(sudo netstat -antp)
 
     printf "C010_2_R1:1:4, hostname,protocol,local_port,process_name\n"
@@ -41,7 +40,7 @@ function ports_and_services(){
                 port=$(echo $line | awk '{print $4}' | cut -d ":" -f 2)
                 ip_type="IPv4"
             fi
-            printf "%s,%s,%s,%s,%s\n" $host_name $protocol_type $port $ip_type $process_name
+            printf "%s,%s,%s,%s,%s\n" $hostname $protocol_type $port $ip_type $process_name
         fi
     done
 }
@@ -84,7 +83,6 @@ function generic_accounts(){
 
 function auth_methods(){
     cat /etc/pam.d/system-auth | grep -i 'auth ' | grep -v '#'
-
     sys_log="/etc/syslog.conf"
 
     if [ -e "$sys_log" ]; then
@@ -97,7 +95,6 @@ function auth_methods(){
 
 function check_itncm_version(){
     version="/opt/IBM/tivoli/netcool/ncm/config/rseries_version.txt"
-
     if [ -e "$version" ]; then
         printf "###___ITNCM Version___###\n\n"
         cat $version
@@ -165,9 +162,7 @@ function os_info(){
 }
 
 function installed_software(){
-    host_name=$(hostname)
-
-    printf "C010_2_R1:1:2,host_name,display_name,display_version,architecture\n"
+    printf "C010_2_R1:1:2,hostname,display_name,display_version,architecture\n"
     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
         first_field=$(echo ${app} | awk -F "." '{print $1}')
         dv_prefix=$(echo ${app} | awk -F "-" '{print $(NF-1)}')
@@ -177,7 +172,7 @@ function installed_software(){
         architecture=$(echo ${app} | awk -F "." '{print $NF}')
         display_version="${dv_prefix}${dv_suffix}"
 
-        printf "C010_2_R1:1:2,%s,%s,%s,%s\n" $host_name $display_name $display_version $architecture 
+        printf "C010_2_R1:1:2,%s,%s,%s,%s\n" $hostname $display_name $display_version $architecture 
     done
 }
 
@@ -199,6 +194,7 @@ function db2_application(){
 #================================================================================
 
 printf "### HOST_ADDRESS_INFO_START ###\n\n"
+hostname=$(hostname)
 get_network_info
 printf "\n### HOST_ADDRESS_INFO_END ###\n\n"
 
