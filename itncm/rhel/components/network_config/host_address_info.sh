@@ -49,5 +49,5 @@ function get_network_info(){ # Using netstat
 
 
 
-#get_network_info
-enumerate_adatpers
+get_network_info
+#enumerate_adatpers
