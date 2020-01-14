@@ -17,7 +17,7 @@
 # }
 
 function get_network_info(){ # Using netstat
-    printf "hostname,ip_address,mac_address\n"
+    #printf "hostname,ip_address,mac_address\n"
     #ns_enum=$(netstat -i | column -t | awk '/Iface/{getline; print}' | awk '{print $1}')
     
     adapters=()
@@ -31,9 +31,11 @@ function get_network_info(){ # Using netstat
         else
             adapters[counter]=$interface
             counter+=1
+    done
      
     echo "${adapters[@]}"
-
+}
+ 
     # for a in $adapters; do
     #     if [ "$a" = "lo" ] || [ "$a" = "p2p-dev-wlp2s0" ]; then
     #         continue
