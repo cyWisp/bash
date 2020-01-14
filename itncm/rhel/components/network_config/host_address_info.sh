@@ -17,11 +17,7 @@
 # }
 
 function get_network_info(){ # Using netstat
-    #printf "hostname,ip_address,mac_address\n"
-    #ns_enum=$(netstat -i | column -t | awk '/Iface/{getline; print}' | awk '{print $1}')
-    
-    #adapters=()
-    #counter=0
+    printf "hostname,ip_address,mac_address\n"
     ns_enum=$(netstat -i | column -t)
     
     echo "${ns_enum}" | while read output_line; do
@@ -29,12 +25,14 @@ function get_network_info(){ # Using netstat
         if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ] || [ "$interface" = "lo" ]; then
             continue
         else
-            echo "${interface}"
+            hostname=$(hostname)
+            ip_address=$(ip addr | grep ${interface} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
+            mac_address=$(ip addr | grep ${interface} -A1 | grep ether | awk '{print $2}')
+
+            printf "Adapter: %s\n-------\nHOST:IP:MAC,%s,%s,%s\n" $interface $hostname $ip_address $mac_address
         fi
-        
     done
      
-    #echo "${adapters[@]}"
 }
  
     # for a in $adapters; do
@@ -42,10 +40,10 @@ function get_network_info(){ # Using netstat
     #         continue
     #     else
     #         hostname=$(hostname)
-    #         ip_address=$(ip addr | grep ${a} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
-    #         mac_address=$(ip addr | grep ${a} -A1 | grep ether | awk '{print $2}')
+            # ip_address=$(ip addr | grep ${a} | grep inet | cut -d "/" -f 1 | awk '{print $2}')
+            # mac_address=$(ip addr | grep ${a} -A1 | grep ether | awk '{print $2}')
 
-    #         printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
+            # printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
     #     fi
     # done
 #}
