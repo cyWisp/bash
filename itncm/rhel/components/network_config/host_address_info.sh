@@ -49,7 +49,7 @@ function get_network_info(){ # Using netstat
     #         printf "HOST:IP:MAC,%s,%s,%s\n" $hostname $ip_address $mac_address
     #     fi
     # done
-}
+#}
 
 
 
