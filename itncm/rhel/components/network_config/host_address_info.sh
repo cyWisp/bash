@@ -26,13 +26,12 @@ function get_network_info(){ # Using netstat
     
     echo "${ns_enum}" | while read output_line; do
         interface=$(echo "${output_line}" | awk '{print $1}')
-        # if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ]; then
-        #     continue
-        # else
-        #     adapters[counter]=$interface
-        #     counter+=1
-        # fi
-        echo "${interface}"
+        if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ] || [ "$interface" = "lo" ]; then
+            continue
+        else
+            echo "${interface}"
+        fi
+        
     done
      
     #echo "${adapters[@]}"
