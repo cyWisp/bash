@@ -20,20 +20,22 @@ function get_network_info(){ # Using netstat
     #printf "hostname,ip_address,mac_address\n"
     #ns_enum=$(netstat -i | column -t | awk '/Iface/{getline; print}' | awk '{print $1}')
     
-    adapters=()
-    counter=0
+    #adapters=()
+    #counter=0
     ns_enum=$(netstat -i | column -t)
     
     echo "${ns_enum}" | while read output_line; do
         interface=$(echo "${output_line}" | awk '{print $1}')
-        if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ]; then
-            continue
-        else
-            adapters[counter]=$interface
-            counter+=1
+        # if [ "$interface" = "Kernel" ] || [ "$interface" = "Iface" ]; then
+        #     continue
+        # else
+        #     adapters[counter]=$interface
+        #     counter+=1
+        # fi
+        echo "${interface}"
     done
      
-    echo "${adapters[@]}"
+    #echo "${adapters[@]}"
 }
  
     # for a in $adapters; do
