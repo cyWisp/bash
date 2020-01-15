@@ -157,6 +157,7 @@ function os_info(){
         printf "Hostname: %s\n" $hostname
         echo "${bios_info}" | while read x; do
             printf "%s " $x
+        done
     fi
     
     # printf "###__Firmware or BIOS__START ###\n\n"
