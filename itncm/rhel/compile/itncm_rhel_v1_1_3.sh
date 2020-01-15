@@ -133,10 +133,11 @@ function read_age_results(){
         current_date=$(date +%Y-%m-%d)
         pw_age=$(echo $(( (`date -d $current_date +%s` - `date -d $creation_date +%s`) / 86400 )))
         pw_age_months=$(expr ${pw_age} / 30)
+        user_display_name=$(echo "${user_entry}" | cut -d ":" -f 2)
 
         #printf "Password last set: %s days\n" $pw_age
         #printf "Password age: %s months\n\n" $pw_age_months
-        printf "CIP:007_6_R5:6,%s,%s,%s,%s\n" $hostname $user_entry $creation_date $pw_age_months
+        printf "CIP:007_6_R5:6,%s,%s,%s,%s\n" $hostname $user_display_name $creation_date $pw_age_months
     done
     rm $user_age_temp
 }
@@ -335,7 +336,7 @@ printf "###__Any commercially available or open_source application software inst
 installed_software
 db2_application
 
-printf "### CIP:010_2_R1:1:2__END ###\n\n"
+printf "\n### CIP:010_2_R1:1:2__END ###\n\n"
 
 
 #==================================| CIP 010__3 |================================
