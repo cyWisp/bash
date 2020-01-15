@@ -133,7 +133,7 @@ function read_age_results(){
         current_date=$(date +%Y-%m-%d)
         pw_age=$(echo $(( (`date -d $current_date +%s` - `date -d $creation_date +%s`) / 86400 )))
         pw_age_months=$(expr ${pw_age} / 30)
-        user_display_name=$(echo "${user_entry}" | cut -d ":" -f 2)
+        user_display_name=$(echo "${user_entry}" | cut -d ":" -f 1)
 
         #printf "Password last set: %s days\n" $pw_age
         #printf "Password age: %s months\n\n" $pw_age_months
