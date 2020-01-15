@@ -151,10 +151,12 @@ function os_info(){
     printf "C010_2_R1:1:1,hostname,OS,bios,gpu\n"
 
     if [ -e $redhat_info ]; then
-        os_information=$(cat $redhat_info)
-        printf "C010_2_R1:1:1,%s,%s,%s,%s\n" $hostname $os_information $bios_info $gpu_info       
+        #os_information=$(cat $redhat_info)
+        :
     else
-        printf "C010_2_R1:1:1,%s,%s,%s\n" $hostname $bios_info $gpu_info
+        printf "Hostname: %s\n" $hostname
+        echo "${bios_info}" | while read x; do
+            printf "%s " $x
     fi
     
     # printf "###__Firmware or BIOS__START ###\n\n"
