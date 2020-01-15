@@ -3,7 +3,7 @@ function ports_and_services(){
     host_name=$(hostname)
     netstat_output=$(sudo netstat -antp)
 
-    printf "C010_2_R1:1:4, hostname,protocol,local_port,process_name\n"
+    printf "C010_2_R1:1:4, hostname,protocol,local_port,ip_version,process_name\n"
     echo "${netstat_output}" | while read line; do
         protocol_type=$(echo $line | awk '{print $1}')
         port_status=$(echo $line | awk '{print $6}')
@@ -16,6 +16,13 @@ function ports_and_services(){
                 port=$(echo $line | awk '{print $4}' | cut -d ":" -f 2)
                 ip_type="IPv4"
             fi
+
+            if [ "$process_name" = "-" ]; then
+                $process_name="n/a"
+            else
+                :
+            fi
+            
             printf "%s,%s,%s,%s,%s\n" $host_name $protocol_type $port $ip_type $process_name
         fi
     done
