@@ -156,7 +156,7 @@ function os_info(){
         :
     fi
 
-    printf "C010_2_R1:1:1,%s,%s,%s" ${os_information} ${bios_info} ${gpu_info}
+    printf "C010_2_R1:1:1\n%s\n%s\n%s" ${os_information} ${bios_info} ${gpu_info}
 
 
     
