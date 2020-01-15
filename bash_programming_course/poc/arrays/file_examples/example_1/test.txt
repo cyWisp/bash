@@ -1,0 +1,5 @@
+this is just a test file
+we are going to read these lines
+and manipulate them with bash
+there are currently five lines
+in this file.
