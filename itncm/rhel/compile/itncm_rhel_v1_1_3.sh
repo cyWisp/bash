@@ -151,7 +151,7 @@ function os_info(){
     printf "C010_2_R1:1:1,hostname,OS,bios,gpu\n"
 
     if [ -e $redhat_info ]; then
-        $os_information=$(cat $redhat_info)
+        $os_information=$(cat ${redhat_info})
     else
         :
     fi
