@@ -127,16 +127,12 @@ function calc_user_age(){
 function read_age_results(){
     printf "C007_6_R5:6,hostname,user,pw_set,pw_age\n"
     cat $user_age_temp | while read user_entry; do
-
-        #printf "%s\n" $user_entry
+        user_display_name=$(echo "${user_entry}" | cut -d ":" -f 1)
         creation_date=$(echo ${user_entry} | cut -d ":" -f 2)
         current_date=$(date +%Y-%m-%d)
         pw_age=$(echo $(( (`date -d $current_date +%s` - `date -d $creation_date +%s`) / 86400 )))
         pw_age_months=$(expr ${pw_age} / 30)
-        user_display_name=$(echo "${user_entry}" | cut -d ":" -f 1)
 
-        #printf "Password last set: %s days\n" $pw_age
-        #printf "Password age: %s months\n\n" $pw_age_months
         printf "CIP:007_6_R5:6,%s,%s,%s,%s\n" $hostname $user_display_name $creation_date $pw_age_months
     done
     rm $user_age_temp
@@ -149,23 +145,26 @@ function account_lockout(){
 
 function os_info(){
     redhat_info="/etc/redhat-release"
-    
+    bios_info=$(sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g')
+    gpu_info=$(lspci | grep -i vga | cut -d " " -f 5-10)
+
+    printf "C010_2_R1:1:1,hostname,OS,bios,gpu\n"
+
     if [ -e $redhat_info ]; then
-        printf "###__System OS__START ###\n\n"
-        cat $redhat_info 
-        printf "\n###__System OS__END ###\n\n"     
+        os_information=$(cat $redhat_info)
+        printf "C010_2_R1:1:1,%s,%s,%s,%s\n" $hostname $os_information $bios_info $gpu_info       
     else
-        :
+        printf "C010_2_R1:1:1,%s,%s,%s\n" $hostname $bios_info $gpu_info
     fi
     
-    printf "###__Firmware or BIOS__START ###\n\n"
-    printf "BIOS Version: "
-    sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g'
-    printf "\n###__Firmware or BIOS__END ###\n\n" 
+    # printf "###__Firmware or BIOS__START ###\n\n"
+    # printf "BIOS Version: "
+    # sudo dmidecode | grep "BIOS Information" -A 5 | grep "Version:" | cut -d : -f 2 | sed 's/-//g'
+    # printf "\n###__Firmware or BIOS__END ###\n\n" 
     
-    printf "###__GPU__START ###\n\n"
-    lspci | grep -i vga | cut -d " " -f 5-10
-    printf "\n###__GPU__END ###\n\n"
+    # printf "###__GPU__START ###\n\n"
+    # lspci | grep -i vga | cut -d " " -f 5-10
+    # printf "\n###__GPU__END ###\n\n"
 }
 
 function installed_software(){
