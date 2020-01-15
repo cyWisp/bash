@@ -1,6 +1,6 @@
 #!/bin/bash
 
-hostname=$(hostname)
+#hostname=$(hostname)
 netstat_output=$(sudo netstat -antp | grep LISTEN)
 
 echo "${netstat_output}" | while read line; do
@@ -23,6 +23,6 @@ echo "${netstat_output}" | while read line; do
             :
         fi
             
-        printf "%s,%s,%s,%s,%s\n" $hostname $protocol_type $port $ip_type $process_name
+        printf "%s,%s,%s,%s\n" $protocol_type $port $ip_type $process_name
     fi
 done
