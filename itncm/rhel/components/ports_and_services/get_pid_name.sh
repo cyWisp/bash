@@ -23,6 +23,6 @@ echo "${netstat_output}" | while read line; do
             :
         fi
             
-        printf "%s,%s,%s,%s,%s\n" $host_name $protocol_type $port $ip_type $process_name
+        printf "%s,%s,%s,%s,%s\n" $hostname $protocol_type $port $ip_type $process_name
     fi
 done
