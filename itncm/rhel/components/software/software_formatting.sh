@@ -12,7 +12,7 @@ function installed_software(){
         #architecture=$(echo ${app} | awk -F "." '{print $NF}')
         #display_version="${dv_prefix}${dv_suffix}"
 
-        printf "%s\n" $display_name
+        printf "%s\n" $first_field
 
         #printf "C010_2_R1:1:2,%s,%s,%s,%s\n" $host_name $display_name $display_version $architecture 
     done
