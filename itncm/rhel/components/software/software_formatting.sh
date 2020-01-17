@@ -2,10 +2,12 @@
 function installed_software(){
     hostname=$(hostname)
 
-    printf "C010_2_R1:1:2,host_name,display_name,display_version,architecture\n"
+    printf "C010_2_R1:1:2,host_name,display_name-display_version,architecture\n"
     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
         
-        printf "%s,%s\n" $hostname $app
+        architecture=$(echo ${app} | awk -F "." '{print $NF}')
+        display_name_version=$(echo ${app} | awk -F "." '{$NF=""; print $0}')
+        printf "%s,%s,%s\n" $hostname $display_name_version $architecture
         # display_name=$(echo ${app} | awk -F "." '{print $1}')
         # dv_prefix=$(echo ${app} | awk -F "-" '{print $(NF-1)}')
         # dv_suffix=$(echo ${dv_prefix} | awk -F "." '{print $1}')
