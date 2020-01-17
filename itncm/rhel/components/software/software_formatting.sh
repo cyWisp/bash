@@ -10,7 +10,7 @@ function installed_software(){
         
         
 
-        printf "%s\n" $app
+        printf "%s,%s\n" $hostname $app
         
         #printf "%s,%s,%s\n" $hostname $display_name_version $architecture
         # display_name=$(echo ${app} | awk -F "." '{print $1}')
