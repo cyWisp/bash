@@ -6,9 +6,11 @@ function installed_software(){
     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
         
         #architecture=$(echo ${app} | awk -F "." '{print $NF}')
-        display_name_version=$(echo ${app} | awk -F "." '{$NF=""; print $0}')
+        #display_name_version=$(echo ${app} | awk -F "." '{$NF=""; print $0}')
         
-        printf "%s\n" $display_name_version
+        
+
+        printf "%s\n" $app
         
         #printf "%s,%s,%s\n" $hostname $display_name_version $architecture
         # display_name=$(echo ${app} | awk -F "." '{print $1}')
