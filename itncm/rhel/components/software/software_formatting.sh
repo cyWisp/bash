@@ -1,6 +1,6 @@
 #!/bin/bash
 function installed_software(){
-    host_name=$(hostname)
+    hostname=$(hostname)
 
     printf "C010_2_R1:1:2,host_name,display_name,display_version,architecture\n"
     rpm -qa | sort |tr [a-z] [A-Z] | while read app; do
