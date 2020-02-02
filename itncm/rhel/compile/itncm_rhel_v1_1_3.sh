@@ -105,7 +105,7 @@ function check_itncm_version(){
         cat $version
     else
         :
-    fi
+    fi  
 }
 
 function password_complexity(){
