@@ -3,7 +3,7 @@
 vm_tools="/dev/cdrom"
 mount_dir="/mnt/cdrom"
 temp_dir="/tmp/vmware_tools"
-admin="ADMINforJUSTICE1220!"
+admin="" # this is the admin password for the machine
 
 # Install dependecies
 echo ${admin} | sudo -S yum install perl kernel-devel kernel-headers gcc -y
