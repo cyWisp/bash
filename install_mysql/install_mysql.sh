@@ -19,14 +19,33 @@ fi
 if [ ! -f ${download_file_name} ]
 then
 	echo "[*] Downloading mysql..."
-	echo ${admin} | sudo -S curl -L ${mysql_download_url} -o ${download_dir}
+	echo ${admin} | sudo -S curl -L ${mysql_download_url} -o ${download_file_name}
 else
 	echo "[!] File ${download_file_name} exists- skipping..."
 fi
 
 # Update mysql software repository
-echo ${admin} | sudo -S yum install ${download_file_name}
+echo "[!] Updating mysql repositories..."
+echo "[!] Navigating to ${mysql_temp_dir}"
+cd ${mysql_temp_dir}
+echo ${admin} | sudo -S yum -y install ${mysql_release}
 
+# Install mysql-server
+echo "[!] Installing mysql..."
+sudo yum install -y mysql-server
 
+# Start mysqld
+echo "[!] Starting mysqld service"
+echo ${admin} | sudo -S systemctl start mysqld
 
+# Grab temporary password and save it to /home/$(whoami)/mysql_temp_pw
+temp_pw=$(sudo grep 'temporary password' /var/log/mysqld.log) 
+temp_pw_target="/home/$(whoami)/mysql_temp_pw"
 
+echo "[!] Storing temporary password in ${temp_pw}"
+echo "${temp_pw} > ${temp_pw_target}"
+
+# Clean up and exit
+cd
+echo "[!] Cleaning up..."
+sudo rm -rf ${mysql_temp_dir}
