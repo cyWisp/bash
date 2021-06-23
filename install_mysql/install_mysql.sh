@@ -1,6 +1,6 @@
 #!/bin/bash
 
-admin='ADMINforJUSTICE1220!'
+admin=''
 mysql_temp_dir='/tmp/mysql_install'
 mysql_download_url='https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm'
 mysql_release='mysql80-community-release-el7-3.noarch.rpm'
@@ -42,8 +42,8 @@ echo ${admin} | sudo -S systemctl start mysqld
 temp_pw=$(sudo grep 'temporary password' /var/log/mysqld.log) 
 temp_pw_target="/home/$(whoami)/mysql_temp_pw"
 
-echo "[!] Storing temporary password in ${temp_pw}"
-echo "${temp_pw} > ${temp_pw_target}"
+echo "[!] Storing temporary password in ${temp_pw_target}"
+echo ${temp_pw} > ${temp_pw_target}
 
 # Clean up and exit
 cd
