@@ -49,3 +49,7 @@ echo ${temp_pw} > ${temp_pw_target}
 cd
 echo "[!] Cleaning up..."
 sudo rm -rf ${mysql_temp_dir}
+
+# Post Installation Message
+echo '[!] Please run "sudo mysql_secure_installation" to secure your mysql install...'
+echo "[*] Installation successful!"
