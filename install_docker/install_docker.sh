@@ -3,6 +3,12 @@
 # This script will set up the Docker repository
 # and install Docker on CentOS 7
 
+if [ $# -eq 0 ]
+then
+	echo "Please provide a user name..."
+	exit 0
+fi
+
 admin=$1
 pass="ADMINforJUSTICE1220!"
 docker_repo="https://download.docker.com/linux/centos/docker-ce.repo"
@@ -28,9 +34,8 @@ then
 	printf "[!] Group already exists, bypassing...\n"
 fi
 
-
 printf "[!] Adding user ${admin} to docker group...\n"
-sudo usermod -aG docker ${admin}
+echo ${pass} | sudo -S usermod -aG docker ${admin}
 
 printf "[!] Refreshing group membership..."
 newgrp docker
