@@ -10,7 +10,7 @@ then
 fi
 
 admin=$1
-pass="ADMINforJUSTICE1220!"
+pass=""
 docker_repo="https://download.docker.com/linux/centos/docker-ce.repo"
 log_file="./install.log"
 
