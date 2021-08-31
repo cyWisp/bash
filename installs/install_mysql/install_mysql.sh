@@ -3,6 +3,7 @@
 # Get admin credentials
 read -p "[?] Admin password: " -s admin
 
+# MySQL urls and paths
 mysql_temp_dir='/tmp/mysql_install'
 mysql_download_url='https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm'
 mysql_release='mysql80-community-release-el7-3.noarch.rpm'
@@ -53,11 +54,7 @@ function start_mysql () {
 function get_temp_pw () {
 	temp_pw_string=$(sudo grep 'temporary password' /var/log/mysqld.log)
 	temp_pw=$(echo "${temp_pw_string}" | awk '{print $NF}') 
-	printf "MySQL Temporary password: %s\n" "$temp_pw"
-	#temp_pw_target="/home/$(whoami)/mysql_temp_pw"
-	
-	#echo "[!] Storing temporary password in ${temp_pw_target}"
-	#echo ${temp_pw} > ${temp_pw_target}
+	printf "[*] MySQL Temporary password: %s\n" "$temp_pw"	
 }
 
 # Clean up and exit
