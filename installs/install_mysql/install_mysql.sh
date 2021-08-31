@@ -1,6 +1,8 @@
 #!/bin/bash
 
-admin=''
+# Sudo credentials
+read -p "[?] Admin password: " -s admin
+
 mysql_temp_dir='/tmp/mysql_install'
 mysql_download_url='https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm'
 mysql_release='mysql80-community-release-el7-3.noarch.rpm'
@@ -32,7 +34,7 @@ echo ${admin} | sudo -S yum -y install ${mysql_release}
 
 # Install mysql-server
 echo "[!] Installing mysql..."
-sudo yum install -y mysql-server
+echo ${admin} | sudo -S yum -y install mysql-server
 
 # Start mysqld
 echo "[!] Starting mysqld service"
@@ -48,7 +50,7 @@ echo ${temp_pw} > ${temp_pw_target}
 # Clean up and exit
 cd
 echo "[!] Cleaning up..."
-sudo rm -rf ${mysql_temp_dir}
+echo ${admin} | sudo -S rm -rf ${mysql_temp_dir}
 
 # Post Installation Message
 echo '[!] Please run "sudo mysql_secure_installation" to secure your mysql install...'
