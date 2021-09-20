@@ -65,7 +65,7 @@ function post_install () {
 	echo ${pass} | sudo -S usermod aG docker ${user}
 
 	echo "[!] Refreshing group membership..."
-	newgrp docker
+	echo ${pass} | sudo -S newgrp docker
 }
 
 uninstall_old_versions
