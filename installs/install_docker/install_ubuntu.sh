@@ -33,7 +33,11 @@ function set_up_repo () {
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 	sudo apt-key add -
 
+<<<<<<< HEAD
+	# sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+=======
 #	sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+>>>>>>> 5849fe51aca57e1fdb1546b3e2c67dbb908ad5ee
 
 	# Set up 'stable repository'
 	echo "[!] Setting up 'stable' repository..."
@@ -41,5 +45,36 @@ function set_up_repo () {
 	sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 }
 
+function install_docker () {
+	# Update repositories and install docker
+	echo "[!] Installing docker..."
+	echo "${pass}" | sudo -S apt update
+	sudo apt install \
+		docker-ce \
+		docker-ce-cli \
+		containerd.io
+}
+
+function post_install () {
+	# Post install - create docker group if it doesn't exist
+	echo "[!] Initializing post-installation tasks..."
+	echo "[!] Creating docker group..."
+	sudo groupadd docker
+	exit_code=$?
+
+	if [ ${exit_code} -eq '9' ]
+	then
+    	printf "[!] Group already exists, bypassing...\n"
+	fi
+
+	echo "[!] Adding user ${user} to docker group..."
+	echo ${pass} | sudo -S usermod aG docker ${user}
+
+	echo "[!] Refreshing group membership..."
+	newgrp docker
+}
+
 uninstall_old_versions
 set_up_repo
+install_docker
+post_install
