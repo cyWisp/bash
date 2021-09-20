@@ -33,12 +33,6 @@ function set_up_repo () {
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 	sudo apt-key add -
 
-<<<<<<< HEAD
-	# sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-=======
-#	sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
->>>>>>> 5849fe51aca57e1fdb1546b3e2c67dbb908ad5ee
-
 	# Set up 'stable repository'
 	echo "[!] Setting up 'stable' repository..."
 	echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
