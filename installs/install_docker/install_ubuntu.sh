@@ -21,7 +21,7 @@ function set_up_repo () {
 	# Set up repository
 	echo "[!] Installing necessary packages..."
 	echo "${pass}" | sudo -S apt update
-	echo "${pass}" | sudo -S apt install \
+	echo "${pass}" | sudo -S apt install -y \
 		apt-transport-https \
 		ca-certificates \
 		curl \
@@ -31,7 +31,9 @@ function set_up_repo () {
 	# Add Docker's official GPG key:
 	echo "[!] Downloading and adding official Docker GPG key..."
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-	sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+	sudo apt-key add -
+
+#	sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
 	# Set up 'stable repository'
 	echo "[!] Setting up 'stable' repository..."
