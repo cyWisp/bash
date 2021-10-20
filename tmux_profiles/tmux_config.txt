@@ -1,7 +1,0 @@
-# Map prefix to screens
-set -g prefix C-a
-bind C-a send-prefix
-unbind C-b
-
-# Source native bash profile
-set -g default-terminal "screen-256color"
