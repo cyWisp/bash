@@ -6,11 +6,12 @@
 # Gather superuser credentials
 # and query the device
 read -p "[?] Pass: " -s pass
-echo "${pass}" | sudo -S modprobe -r psmouse
+echo "${pass}" | sudo -S modprobe -r psmouse 1>/dev/null
+echo ""
 
 # Start the driver
 echo "[+] Restarting touchpad..."
-sudo modprobe psmouse
+sudo modprobe psmouse 1>/dev/null
 
 # If there's an error, notify
 # else present a confirmation message
