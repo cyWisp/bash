@@ -1,2 +1,8 @@
 "Set indentation level
 set tabstop=4
+
+"Turn on sytax highlighting
+syntax on
+
+"Turn on line numbers
+set number
