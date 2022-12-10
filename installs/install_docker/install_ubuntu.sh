@@ -14,7 +14,8 @@ function uninstall_old_versions () {
 		docker \
 		docker-engine \
 		docker.io \
-		containerd runc
+		containerd \
+		runc
 }
 
 function set_up_repo () {
@@ -26,20 +27,30 @@ function set_up_repo () {
 		ca-certificates \
 		curl \
 		gnupg \
-		lsb-release
+		lsb-release \
+		software-properties-common
 
 	# Add Docker's official GPG key:
 	echo "[!] Downloading and adding official Docker GPG key..."
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-	sudo apt-key add -
+	
+	# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+	# sudo apt-key add -
 
 	# Modify key permissions
-	sudo chmod a+r /usr/share/keyrings/docker-archive-keyring.gpg
+	# sudo chmod a+r /usr/share/keyrings/docker-archive-keyring.gpg
+
+	sudo mkdir -p /etc/apt/keyrings
+
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+	sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 	# Set up 'stable repository'
 	echo "[!] Setting up 'stable' repository..."
 	echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
 	sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+	# Update repository
+	sudo apt update
 }
 
 function install_docker () {
@@ -61,17 +72,17 @@ function post_install () {
 
 	if [ ${exit_code} -eq '9' ]
 	then
-    	printf "[!] Group already exists, bypassing...\n"
+    		printf "[!] Group already exists, bypassing...\n"
 	fi
 
 	echo "[!] Adding user ${user} to docker group..."
-	echo ${pass} | sudo -S usermod aG docker ${user}
+	sudo usermod -aG docker ${user}
 
 	echo "[!] Refreshing group membership..."
-	echo ${pass} | sudo -S newgrp docker
+	sudo -S newgrp docker
 }
 
 uninstall_old_versions
 set_up_repo
 install_docker
-# post_install
+post_install
