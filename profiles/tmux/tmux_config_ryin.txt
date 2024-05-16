@@ -13,6 +13,9 @@ set -g prefix C-a
 # send C-a
 bind C-a send-prefix
 
+# unbind C-b
+unbind C-b
+
 # change default delay
 set -sg escape-time 0
 
