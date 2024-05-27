@@ -1,0 +1,14 @@
+# List all aliases
+alias get-aliases="less /Users/rdaglio/.zsh_aliases"
+
+# General utilities
+alias get-date="date '+%Y-%m-%d %H:%M:%S'"
+
+# Homebrew shortcuts
+alias check-update="brew update; brew outdated"
+alias upgrade-all="brew upgrade; brew cleanup"
+
+# Navigation
+alias ls="ls -l -a"
+alias goto-repos="cd ~/Lab/repos"
+

@@ -1,0 +1,3 @@
+# Set prompt
+setopt PROMPT_SUBST
+PROMPT='%F{red}%n%f%F{white}@%f%F{blue}%m%f%F{white}~%f%F{green}$%f%F{white}:%f '
