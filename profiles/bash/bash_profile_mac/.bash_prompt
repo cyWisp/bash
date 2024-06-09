@@ -1,0 +1,10 @@
+# Enable colors
+export CLICOLOR=1
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
+#PS1="\[\e[0;93m\]\u@\n:$ \[\e[m\]"
+
+# Custom prompt
+PS1="\[\e[1;91m\]\u\[\e[0m\]\[\e[1;32m\]@\[\e[0m\]\[\e[1;36m\]\h\[\e[0m\]~\[\e[1;32m\]$\[\e[0m\]: "
+
+export PS1;
