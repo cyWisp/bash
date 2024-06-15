@@ -41,8 +41,8 @@ function install_docker () {
 }
 
 function post_install () {
-  groupadd docker
-  usermod -aG docker $1
+  sudo groupadd docker
+  sudo usermod -aG docker $1
   newgrp docker
 }
 
