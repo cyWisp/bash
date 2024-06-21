@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Provide explicit user, e.g. - ./install_docker_ubuntu_server-22-04.sh wisp
+user=$1
 
 function log () {
   echo "${BASHPID} $(date '+%d-%m-%Y %H:%M:%S'): $1"
@@ -40,9 +41,12 @@ function install_docker () {
   apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 }
 
+# Run these commands after script runs
 function post_install () {
-  groupadd docker
-  usermod -aG docker $1
+  sudo groupadd docker
+  sudo usermod -aG docker $1
+  
+  su $1
   newgrp docker
 }
 
@@ -50,4 +54,4 @@ function post_install () {
 verify_root
 repo_setup
 install_docker
-post_install
+post_install $user
