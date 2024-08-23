@@ -1,0 +1,27 @@
+# List all aliases
+alias get-aliases="less /Users/rdaglio/.zsh_aliases"
+
+# General utilities
+alias get-date="date '+%Y-%m-%d %H:%M:%S'"
+
+# Homebrew shortcuts
+alias check-update="brew update; brew outdated"
+alias upgrade-all="brew upgrade; brew cleanup"
+
+# Navigation
+alias ls="ls -l -a"
+alias goto-repos="cd ~/Lab/repos"
+
+# MiniKube Kubectl alias
+alias k="minikube kubectl --"
+
+# Git shortcuts
+alias git-undo="git reset --soft HEAD~"
+
+# Create or remove new typescript project
+alias create-ts-project="/opt/scripts/create-ts-project.sh"
+alias remove-ts-project="/opt/scripts/remove-ts-project.sh"
+
+# AWS ADFS Auth
+alias aws-adfs-auth="/opt/scripts/aws_adfs_auth.sh"
+
