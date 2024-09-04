@@ -1,3 +1,14 @@
+# Get branch name
+function get_branch () {
+	branch=$(git branch 2> /dev/null | grep '*' | awk '{print $2}')
+
+	if [[ "${branch}" == "" ]]; then
+		echo "~"
+	else
+		echo "(${branch})"
+	fi
+}
+
 # Set prompt
 setopt PROMPT_SUBST
-PROMPT='%F{red}%n%f%F{white}@%f%F{blue}%m%f%F{white}~%f%F{green}$%f%F{white}:%f '
+PROMPT='%F{red}%n%f%F{white}@%f%F{blue}%m%f%"$(get_branch)%F{green}$%f%F{white}:%f '
