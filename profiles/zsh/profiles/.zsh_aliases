@@ -17,6 +17,9 @@ alias k="minikube kubectl --"
 
 # Git shortcuts
 alias git-undo="git reset --soft HEAD~"
+alias use-http-1="git config --global http.version HTTP/1.1"
+alias use-http-2="git config --global http.version HTTP/2"
+
 
 # Create or remove new typescript project
 alias create-ts-project="/opt/scripts/create-ts-project.sh"
@@ -24,4 +27,3 @@ alias remove-ts-project="/opt/scripts/remove-ts-project.sh"
 
 # AWS ADFS Auth
 alias aws-adfs-auth="/opt/scripts/aws_adfs_auth.sh"
-
