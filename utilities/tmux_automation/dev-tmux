@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+SNAME="dev"
+
+declare -a nodes_and_ports
+
+nodes_and_ports["1"]=7000
+nodes_and_ports["2"]=7001
+nodes_and_ports["3"]=7002
+nodes_and_ports["4"]=7003
+nodes_and_ports["5"]=7004
+nodes_and_ports["6"]=7005
+
+function create_node_configs {
+  for key in "${!nodes_and_ports[@]}"; do
+    mkdir "rc_node_${key}"
+
+    cat <<EOF > "rc_node_${key}/redis.conf"
+port ${nodes_and_ports[key]}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+bind 0.0.0.0
+EOF
+
+  done
+}
+
+function rc_config_cleanup {
+  for key in "${!nodes_and_ports[@]}"; do
+    if [ -d "rc_node_${key}" ]; then
+
+      echo "[*] Removing rc_node_${key}"
+      rm -rf "rc_node_${key}"
+    fi
+  done
+}
+
+function killold {
+    tmux_ls_output=$(tmux ls 2>&1 | awk -F ' ' '{printf("%s %s %s", $1, $2, $3)}')
+
+    if ! [ "${tmux_ls_output}" == "no server running" ] ; then
+      echo "Killing dev tmux session"
+      tmux kill-session -t $SNAME
+      docker compose down
+    else
+      echo "Starting new tmux session."
+    fi
+}
+
+killold
+create_node_configs
+
+# Make sure we're up-to-date on our containers
+docker compose pull && docker compose up -d --remove-orphans
+
+tmux new -s $SNAME -d
+tmux rename-window -t $SNAME eventProcessor
+tmux send-keys -t $SNAME 'cd orgMgt/eventProcessor/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME ruleProcessor
+tmux send-keys -t $SNAME 'cd orgMgt/ruleProcessor/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME rp-backgroundWorker
+tmux send-keys -t $SNAME 'cd orgMgt/ruleProcessor/app && npm run start-worker' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME pdfProcessor
+tmux send-keys -t $SNAME 'cd orgMgt/pdfProcessor/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME login
+tmux send-keys -t $SNAME 'cd frontEnd/login/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME payload
+tmux send-keys -t $SNAME 'cd frontEnd/payload/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME landing
+tmux send-keys -t $SNAME 'cd frontEnd/landing/app && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME rule-processor-client
+tmux send-keys -t $SNAME 'cd shared/rule-processor-client && npm run dev' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME docker
+tmux send-keys -t $SNAME 'docker compose logs -f' C-m
+
+tmux new-window -t $SNAME
+tmux rename-window -t $SNAME unleashServer
+tmux send-keys -t $SNAME "docker logs -f $(docker ps -aqf 'name=portal-unleash-service')" C-m
+
+
+tmux select-window -t $SNAME:0
+
+[ "$1" != "iterm" ] && tmux attach -t $SNAME
+[ "$1" == "iterm" ] && tmux -CC attach -t $SNAME
+
+killold
+rc_config_cleanup
