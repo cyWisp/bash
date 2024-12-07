@@ -62,9 +62,12 @@ function create_volume () {
 
 
 function create_and_run_container () {
-  log "Creating and running container."
+  container_name=""
 
-  docker run --name postgres-dev \
+  [[ $2 != "" ]] && container_name="$2" || container_name="postgres-test"
+
+  log "Creating and running container."
+  docker run --name $container_name \
   -e POSTGRES_PASSWORD="password" \
   -v "${VOLUME_NAME}:/var/lib/postgresql/data" \
   -p 5432:5432 \
@@ -73,6 +76,6 @@ function create_and_run_container () {
 }
 
 
-pull_image $1
+pull_image "${1}"
 create_volume
-create_and_run_container $1
+create_and_run_container "${1}" "${2}"
