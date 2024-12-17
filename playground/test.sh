@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-var_1="a"
+var_1="dev"
 
-if [ -z $var_1 ]; then echo "empty"; else echo "not empty"; fi
+if [ "${var_1}" == "dev" ]; then echo "its dev"; else echo "its not"; fi
 
