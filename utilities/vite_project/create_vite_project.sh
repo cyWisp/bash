@@ -1,8 +1,61 @@
 #!/usr/bin/env zsh
 
-MAIN_FILE_CONTENT=`cat <<EOF
+CSS_RESET=$(cat <<EOF
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+EOF
+)
+
+MAIN_FILE_CONTENT=$(cat <<EOF
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import './assets/css/reset.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -11,9 +64,9 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 EOF
-`
+)
 
-APP_FILE_CONTENT=`cat <<EOF
+APP_FILE_CONTENT=$(cat <<EOF
 import { useState } from 'react'
 
 function App() {
@@ -33,7 +86,7 @@ function App() {
 
 export default App
 EOF
-`
+)
 
 
 function log () {
@@ -86,8 +139,12 @@ function refine_folder_structure () {
 
 function create_file_templates () {
   log "Creating custom file templates."
-  echo $MAIN_FILE_CONTENT > src/main.tsx
-  echo $APP_FILE_CONTENT > src/App.tsx
+  printf '%s' "${MAIN_FILE_CONTENT}" > src/main.tsx
+  printf '%s' "${APP_FILE_CONTENT}" > src/App.tsx
+  printf '%s' "${CSS_RESET}" > src/assets/css/reset.css
+
+  # Bootstrap - assure file is in ~/.static folder
+  #  cp ~/.static/bootstrap.min.css src/assets/css/
 
   check_error $? "custom template creation"
 }
