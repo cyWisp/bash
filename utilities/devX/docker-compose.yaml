@@ -1,0 +1,84 @@
+services:
+    av:
+        image: clamav/clamav:stable_base
+        platform: linux/x86_64
+        ports:
+            - 3310:3310
+        volumes:
+            - clamdb:/var/lib/clamav
+
+    db:
+        image: postgres:16-bookworm
+        restart: always
+        ports:
+            - 5432:5432
+        env_file:
+            - ./.config/.env.global
+        volumes:
+            - dbdata:/var/lib/postgresql/data
+            - ./shared/utils/pg-multiple-db:/docker-entrypoint-initdb.d
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U postgres']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    unleash-service:
+        image: unleashorg/unleash-server:6.0.6
+        restart: always
+        ports:
+            - 3005:4242
+        env_file:
+            - path: ./.config/.env.global
+            - path: ./frontEnd/features/app/config/.env
+            - path: ./frontEnd/features/app/config/.env.local
+              required: false
+
+        command: ['node', 'index.js']
+        healthcheck:
+            test: wget --no-verbose --tries=1 --spider http://localhost:4242/health || exit 1
+            interval: 1s
+            timeout: 1m
+            retries: 5
+            start_period: 15s
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 5431:8080
+        environment:
+            - ADMINER_DESIGN=dracula
+
+    redis:
+        image: redis:latest
+        restart: always
+        ports:
+            - 6379:6379
+        volumes:
+            - redisdata:/data
+        env_file:
+            - path: ./orgMgt/ruleProcessor/app/config/.env.local
+              required: false
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        command:
+            [
+                'redis-server',
+                '--appendonly',
+                'yes',
+                '--save',
+                '60',
+                '1',
+                '--save',
+                '300',
+                '10',
+            ]
+
+volumes:
+    dbdata:
+    clamdb:
+    redisdata:
