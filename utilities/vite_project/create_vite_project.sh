@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+declare ADDITIONAL_DEPS=(
+    "@chakra-ui/react"
+    "@chakra-ui/theme"
+    "@chakra-ui/theme-tools"
+    "react-icons"
+)
+
 CSS_RESET=$(cat <<EOF
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
@@ -120,6 +127,16 @@ function initialize () {
   check_error $? "dependency installation"
 }
 
+function install_additional_dependencies () {
+    log "Installing additional dependencies."
+
+    for d in "${ADDITIONAL_DEPS[@]}"; do
+        npm i "${d}" --save-dev
+    done
+
+    check_error $? "additional dependencies"
+}
+
 function refine_folder_structure () {
   log "Refining directory structure."
 
@@ -152,6 +169,7 @@ function create_file_templates () {
 
 validate_user_input $1
 initialize $1
+install_additional_dependencies $ADDITIONAL_DEPS
 refine_folder_structure
 create_file_templates
 
