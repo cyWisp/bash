@@ -5,6 +5,9 @@ declare ADDITIONAL_DEPS=(
     "@chakra-ui/theme"
     "@chakra-ui/theme-tools"
     "react-icons"
+    "axios"
+    "@types/axios"
+    "@types/node"
 )
 
 CSS_RESET=$(cat <<EOF
