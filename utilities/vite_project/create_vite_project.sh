@@ -10,6 +10,33 @@ declare ADDITIONAL_DEPS=(
     "@types/node"
 )
 
+VITE_CONFIG_TEMPLATE=$(cat << EOF
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
+
+
+const config = ({mode}) => {
+  const {
+      VITE_LOG_LEVEL,
+      VITE_APP_TITLE
+  } = loadEnv(mode as string, 'config')
+
+  return defineConfig({
+      plugins: [react()],
+      envDir: './.config'
+  })
+}
+
+export default config
+EOF
+)
+
+CONFIG_FILE_TEMPLATE=$(cat <<EOF
+VITE_LOG_LEVEL=info
+VITE_APP_TITLE='New Project'
+EOF
+)
+
 CSS_RESET=$(cat <<EOF
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
@@ -153,15 +180,21 @@ function refine_folder_structure () {
   log "Creating components folder."
   mkdir "src/components"
 
+  log "Creating config directory"
+  mkdir ".config"
+
   check_error $? "folder structure refinement"
 
 }
 
 function create_file_templates () {
   log "Creating custom file templates."
+  printf '%s' "${CONFIG_FILE_TEMPLATE}" > .config/.env
+  printf '%s' "${VITE_CONFIG_TEMPLATE}" > vite.config.ts
   printf '%s' "${MAIN_FILE_CONTENT}" > src/main.tsx
   printf '%s' "${APP_FILE_CONTENT}" > src/App.tsx
   printf '%s' "${CSS_RESET}" > src/assets/css/reset.css
+
 
   # Bootstrap - assure file is in ~/.static folder
   #  cp ~/.static/bootstrap.min.css src/assets/css/
