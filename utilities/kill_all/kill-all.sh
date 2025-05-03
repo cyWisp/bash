@@ -1,13 +1,14 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
-input_string="$1"
+TARGET_PROCESS="$1"
+SCRIPT_NAME="./kill_all.sh"
 
 function log () {
   echo "$(date '+%d-%m-%Y %H:%M:%S'): ${1}"
 }
 
 function validate_user_input () {
-  if [ -z "${input_string}" ]; then
+  if [ -z "${TARGET_PROCESS}" ]; then
     log "Please provide valid process name. Exiting."
     exit 1
   fi
@@ -27,13 +28,16 @@ function kill_duplicate_processes () {
   fi
 
   for process in "${processes[@]}"; do
-    pid="$(echo $process | awk -F ' ' '{print $2}')"
-    process_name="$(echo $process | awk -F ' ' '{print $(NF-1)}')"
+    if [[ "${process}" != *"${SCRIPT_NAME}"* ]]; then
 
-    log "Killing process ${process_name} | ${pid}"
-    kill -s TERM $pid
+      pid="$(echo $process | awk -F ' ' '{print $2}')"
+      process_name="$(echo $process | awk -F ' ' '{print $(NF-1)}')"
+
+      log "Killing process ${process_name} | ${pid}"
+      kill -s TERM $pid
+  fi
   done
 }
 
 validate_user_input
-kill_duplicate_processes $input_string
+kill_duplicate_processes $TARGET_PROCESS
