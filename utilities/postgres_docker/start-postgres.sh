@@ -96,6 +96,7 @@ POSTGRES_PASSWORD=$postgres_password
 POSTGRES_DB=test
 POSTGRES_HOST=localhost
 POSTGRES_PORT=$postgres_port
+
 EOF
 )
     printf '%s' "${config}" > .env
