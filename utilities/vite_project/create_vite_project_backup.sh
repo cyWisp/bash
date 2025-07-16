@@ -4,52 +4,15 @@ declare ADDITIONAL_DEPS=(
     "@chakra-ui/react"
     "@chakra-ui/theme"
     "@chakra-ui/theme-tools"
-    "@emotion/react"
     "react-icons"
     "axios"
     "@types/axios"
     "@types/node"
 )
 
-TSCONFIG_TEMPLATE=$(cat << EOF
-{
-  "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
-  },
-  "include": ["src"]
-}
-
-EOF
-)
-
 VITE_CONFIG_TEMPLATE=$(cat << EOF
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from "vite-tsconfig-paths"
 
 
 const config = ({mode}) => {
@@ -59,7 +22,7 @@ const config = ({mode}) => {
   } = loadEnv(mode as string, 'config')
 
   return defineConfig({
-      plugins: [react(), tsconfigPaths()],
+      plugins: [react()],
       envDir: './.config'
   })
 }
@@ -127,7 +90,6 @@ EOF
 )
 
 MAIN_FILE_CONTENT=$(cat <<EOF
-import { Provider } from "@/components/ui/provider"
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './assets/css/reset.css'
@@ -135,9 +97,7 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider>
-        <App />
-    </Provider>
+    <App />
   </StrictMode>,
 )
 EOF
@@ -197,18 +157,6 @@ function initialize () {
   check_error $? "dependency installation"
 }
 
-function add_snippets () {
-    npx @chakra-ui/cli snippet add
-
-    check_error $? "add snippets"
-}
-
-function setup_vite_config_paths () {
-    npm i -D vite-tsconfig-paths
-
-    check_error $? "setup vite config paths"
-}
-
 function install_additional_dependencies () {
     log "Installing additional dependencies."
 
@@ -223,7 +171,7 @@ function refine_folder_structure () {
   log "Refining directory structure."
 
   log "Removing default css templates."
-  rm "src/*.css src/*.tsx"
+  rm src/*.css src/*.tsx
 
   log "Creating assets directories"
   mkdir "src/assets/css" "src/assets/images"
@@ -234,9 +182,6 @@ function refine_folder_structure () {
 
   log "Creating config directory"
   mkdir ".config"
-
-  log "Removing legacy TS config"
-  rm "./tsconfig.app.json"
 
   check_error $? "folder structure refinement"
 
@@ -249,7 +194,6 @@ function create_file_templates () {
   printf '%s' "${MAIN_FILE_CONTENT}" > src/main.tsx
   printf '%s' "${APP_FILE_CONTENT}" > src/App.tsx
   printf '%s' "${CSS_RESET}" > src/assets/css/reset.css
-  printf '%s' "${TSCONFIG_TEMPLATE}" > tsconfig.app.json
 
 
   # Bootstrap - assure file is in ~/.static folder
@@ -262,11 +206,7 @@ function create_file_templates () {
 validate_user_input $1
 initialize $1
 install_additional_dependencies $ADDITIONAL_DEPS
-add_snippets
-setup_vite_config_paths
 refine_folder_structure
 create_file_templates
 
 npm run dev
-
-
