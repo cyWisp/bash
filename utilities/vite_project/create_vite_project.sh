@@ -9,6 +9,7 @@ declare ADDITIONAL_DEPS=(
     "axios"
     "@types/axios"
     "@types/node"
+    "dotenv"
 )
 
 TSCONFIG_TEMPLATE=$(cat << EOF
@@ -46,31 +47,48 @@ TSCONFIG_TEMPLATE=$(cat << EOF
 EOF
 )
 
-VITE_CONFIG_TEMPLATE=$(cat << EOF
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
+VITE_CONFIG_TEMPLATE=$(cat <<EOF
+import { defineConfig } from 'vite'
 import tsconfigPaths from "vite-tsconfig-paths"
+import react from '@vitejs/plugin-react'
+import dotenv from 'dotenv'
+
+const configPaths = [
+    './.config/.env.local',
+    '../../.config/.env.global'
+]
+
+dotenv.config({path: configPaths})
+
+// Define default values for the environment variables
+const logLevel = process.env.VITE_LOG_LEVEL || 'info'
+const appTitle = process.env.VITE_APP_TITLE || 'My App'
+const appPort = process.env.VITE_APP_PORT
+  ? parseInt(process.env.VITE_APP_PORT)
+  : 3001
 
 
-const config = ({mode}) => {
-  const {
-      VITE_LOG_LEVEL,
-      VITE_APP_TITLE
-  } = loadEnv(mode as string, 'config')
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+  define : {
+    __APP_TITLE__: JSON.stringify(logLevel),
+    __LOG_LEVEL__: JSON.stringify(appTitle),
+    __PORT__: JSON.stringify(appPort)
+  },
+  server: {
+    port: appPort
+  }
+})
 
-  return defineConfig({
-      plugins: [react(), tsconfigPaths()],
-      envDir: './.config'
-  })
-}
-
-export default config
 EOF
 )
 
 CONFIG_FILE_TEMPLATE=$(cat <<EOF
 VITE_LOG_LEVEL=info
 VITE_APP_TITLE='New Project'
+VITE_APP_PORT=3001
+
 EOF
 )
 
@@ -125,6 +143,7 @@ EOF
 #	border-spacing: 0;
 #}
 #EOF
+
 #)
 
 MAIN_FILE_CONTENT=$(cat <<EOF
@@ -141,6 +160,7 @@ createRoot(document.getElementById('root')!).render(
     </Provider>
   </StrictMode>,
 )
+
 EOF
 )
 
@@ -163,6 +183,7 @@ function App() {
 }
 
 export default App
+
 EOF
 )
 
@@ -245,7 +266,7 @@ function refine_folder_structure () {
 
 function create_file_templates () {
   log "Creating custom file templates."
-  printf '%s' "${CONFIG_FILE_TEMPLATE}" > .config/.env
+  printf '%s' "${CONFIG_FILE_TEMPLATE}" > .config/.env.local
   printf '%s' "${VITE_CONFIG_TEMPLATE}" > vite.config.ts
   printf '%s' "${MAIN_FILE_CONTENT}" > src/main.tsx
   printf '%s' "${APP_FILE_CONTENT}" > src/App.tsx
